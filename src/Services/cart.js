@@ -3,10 +3,34 @@ import axios from "axios";
 import { Card, Modal, Button } from "antd";
 import styled from "styled-components";
 
+const getWindowDimensions = () => {
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height,
+  };
+};
 export default function Cart() {
   const [cart, setCart] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [data, setData] = useState(null);
+  const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions()
+  );
+
   const { Meta } = Card;
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  useEffect(() => {
+    console.log(windowDimensions);
+  }, [windowDimensions]);
   useEffect(() => {
     axios
       .get("https://api.pexels.com/v1/search?query=nature&per_page=18", {
@@ -25,8 +49,10 @@ export default function Cart() {
       });
   }, []);
 
-  const showModal = () => {
+  const showModal = (item) => {
     setIsModalVisible(true);
+    setData(item);
+    console.log(item);
   };
   const handleOk = () => {
     setIsModalVisible(false);
@@ -34,6 +60,7 @@ export default function Cart() {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+
   return cart ? (
     <div
       style={{
@@ -46,15 +73,16 @@ export default function Cart() {
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        width={(80 * windowDimensions.width) / 100}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <div style={{ width: "100%", overFlow: "scroll" }}>
+          {data && <img src={data.src.original} style={{ width: "100%" }} />}
+        </div>
       </Modal>
       {cart.photos.map((item, index) => {
         return (
           <Card
-            onClick={showModal}
+            onClick={() => showModal(item)}
             hoverable
             style={{
               width: 240,

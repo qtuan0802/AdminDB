@@ -3,6 +3,7 @@ import styled from "styled-components";
 import "antd/dist/antd.css";
 import Picture from "../Services/picture";
 import Video from "../Services/video";
+import Cart from "../Services/cart";
 import {
   Link,
   NavLink,
@@ -21,6 +22,7 @@ import {
   SettingFilled,
   PictureFilled,
   VideoCameraOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -77,6 +79,17 @@ export default class SlideHeader extends React.Component {
                 </NavLink>
               </Menu.Item>
             </SubMenu>
+            <SubMenu
+              key="sub4"
+              icon={<UnorderedListOutlined />}
+              title="Procuct List"
+            >
+              <Menu.Item key="12" icon={<PictureFilled />}>
+                <NavLink to="/cart" exact>
+                  Product
+                </NavLink>
+              </Menu.Item>
+            </SubMenu>
             <Menu.Item key="9" icon={<FileOutlined />}>
               Files
             </Menu.Item>
@@ -92,6 +105,7 @@ export default class SlideHeader extends React.Component {
             <StyledBreadcrumbContent>
               <Route path="/picture" component={Picture} />
               <Route path="/video" component={Video} />
+              <Route path="/cart" component={Cart} />
             </StyledBreadcrumbContent>
           </StyledContent>
           <StyledFooter> Copy Right ©2021 </StyledFooter>

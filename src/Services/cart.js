@@ -1,32 +1,55 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { Card, Modal, Button } from "antd";
 import styled from "styled-components";
-
+import { productAction } from "../Redux/action";
+const getWindowDimensions = () => {
+  const { innerWidth: width, innerHeight: height } = window;
+  return {
+    width,
+    height,
+  };
+};
 export default function Cart() {
-  const [cart, setCart] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const cart = useSelector((state) => state.product);
+  const dispatch = useDispatch();
   const { Meta } = Card;
+  // const [cart, setcart] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [data, setData] = useState(null);
+  const [windowDimensions, setWindowDimensions] = useState(
+    getWindowDimensions()
+  );
   useEffect(() => {
-    axios
-      .get("https://api.pexels.com/v1/search?query=nature&per_page=18", {
-        headers: {
-          Authorization:
-            "563492ad6f91700001000001e1cfb70ed64349ef95d5a1aa3753dd50",
-        },
-      })
-      .then((res) => {
-        const data = res.data;
-        setCart(data);
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const handleResize = () => {
+      setWindowDimensions(getWindowDimensions());
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const showModal = () => {
+  useEffect(() => {
+    console.log(windowDimensions);
+  }, [windowDimensions]);
+
+  useEffect(() => {
+    dispatch(
+      productAction.getProduct(
+        {
+          token: "563492ad6f91700001000001e1cfb70ed64349ef95d5a1aa3753dd50",
+        },
+        (response) => {
+          console.log(response);
+        }
+      )
+    );
+  }, []);
+
+  const showModal = (item) => {
     setIsModalVisible(true);
+    setData(item);
+    console.log(item);
   };
   const handleOk = () => {
     setIsModalVisible(false);
@@ -34,6 +57,21 @@ export default function Cart() {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+  function handleClick(data) {
+    download(data.src.original);
+  }
+  const download = async (imageSrc) => {
+    const image = await fetch(imageSrc);
+    const imageBlog = await image.blob();
+    const imageURL = URL.createObjectURL(imageBlog);
+    const link = document.createElement("a");
+    link.href = imageURL;
+    link.download = "download.jpeg";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return cart ? (
     <div
       style={{
@@ -42,19 +80,21 @@ export default function Cart() {
       }}
     >
       <Modal
-        title="Basic Modal"
+        title={data && data.photographer}
         visible={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
+        width={(80 * windowDimensions.width) / 100}
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <div style={{ width: "100%" }}>
+          <button onClick={() => handleClick(data)}>Download</button>
+          {data && <img src={data.src.original} style={{ width: "100%" }} />}
+        </div>
       </Modal>
       {cart.photos.map((item, index) => {
         return (
           <Card
-            onClick={showModal}
+            onClick={() => showModal(item)}
             hoverable
             style={{
               width: 240,

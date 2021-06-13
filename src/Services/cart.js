@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { Card, Modal, Button } from "antd";
 import styled from "styled-components";
-import { productAction } from "../Redux/action";
 const getWindowDimensions = () => {
   const { innerWidth: width, innerHeight: height } = window;
   return {
@@ -12,15 +11,26 @@ const getWindowDimensions = () => {
   };
 };
 export default function Cart() {
-  const cart = useSelector((state) => state.product);
-  const dispatch = useDispatch();
-  const { Meta } = Card;
-  // const [cart, setcart] = useState(null);
+  const [cart, setCart] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [data, setData] = useState(null);
   const [windowDimensions, setWindowDimensions] = useState(
     getWindowDimensions()
   );
+
+  const { Meta } = Card;
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  useEffect(() => {
+    console.log(windowDimensions);
+  }, [windowDimensions]);
   useEffect(() => {
     const handleResize = () => {
       setWindowDimensions(getWindowDimensions());
@@ -57,6 +67,7 @@ export default function Cart() {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+<<<<<<< HEAD
   function handleClick(data) {
     download(data.src.original);
   }
@@ -71,6 +82,8 @@ export default function Cart() {
     link.click();
     document.body.removeChild(link);
   };
+=======
+>>>>>>> 11f9bdf1464541ab429b09e53ce557548027770f
 
   return cart ? (
     <div
@@ -86,8 +99,12 @@ export default function Cart() {
         onCancel={handleCancel}
         width={(80 * windowDimensions.width) / 100}
       >
+<<<<<<< HEAD
         <div style={{ width: "100%" }}>
           <button onClick={() => handleClick(data)}>Download</button>
+=======
+        <div style={{ width: "100%", overFlow: "scroll" }}>
+>>>>>>> 11f9bdf1464541ab429b09e53ce557548027770f
           {data && <img src={data.src.original} style={{ width: "100%" }} />}
         </div>
       </Modal>

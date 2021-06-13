@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SlideHeader from "./antComponent/SlideHeader";
 import Picture from "./Services/picture";
 import Video from "./Services/video";
